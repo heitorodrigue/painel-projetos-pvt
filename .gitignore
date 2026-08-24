@@ -8,3 +8,7 @@
 # Arquivos específicos do usuário
 *.user
 *.suo
+
+*.db
+*.db-shm
+*.db-wal
