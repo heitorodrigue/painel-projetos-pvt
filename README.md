@@ -65,8 +65,6 @@ Analista
    └── Apontamentos
 ```
 
-````
-
 ### Cliente
 
 Representa a empresa dona do projeto.
@@ -260,8 +258,3 @@ Depois de iniciar a aplicação, o Swagger pode ser usado para testar os endpoin
 **Heitor Rodrigues Araujo**
 
 Desenvolvido como case técnico para o processo seletivo da PVT Software.
-
-```
-
-```
-````
