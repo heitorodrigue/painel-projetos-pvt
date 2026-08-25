@@ -56,6 +56,35 @@ public class ProjetosController : ControllerBase
         return Ok(resumo);
     }
 
+    [HttpGet("{id:int}/apontamentos")]
+    public async Task<ActionResult<List<ApontamentoDto>>> ListarApontamentos(int id)
+    {
+        var projetoExiste = await _contexto.Projetos
+            .AnyAsync(projeto => projeto.Id == id);
+
+        if (!projetoExiste)
+        {
+            return NotFound("Projeto não encontrado.");
+        }
+
+        var apontamentos = await _contexto.Apontamentos
+            .Where(apontamento => apontamento.ProjetoId == id)
+            .OrderByDescending(apontamento => apontamento.Data)
+            .Select(apontamento => new ApontamentoDto
+            {
+                Id = apontamento.Id,
+                ProjetoId = apontamento.ProjetoId,
+                AnalistaId = apontamento.AnalistaId,
+                Data = apontamento.Data,
+                QuantidadeHoras = apontamento.QuantidadeHoras,
+                Descricao = apontamento.Descricao,
+                Status = apontamento.Status
+            })
+            .ToListAsync();
+
+        return Ok(apontamentos);
+    }
+
     [HttpPost("{id:int}/apontamentos")]
     public async Task<ActionResult> CriarApontamento(
     int id,

@@ -5,6 +5,16 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -21,6 +31,8 @@ builder.Services.AddDbContext<ContextoBanco>(options =>
 builder.Services.AddScoped<ServicoSaudeProjeto>();
 
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 using (var escopo = app.Services.CreateScope())
 {
