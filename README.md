@@ -109,6 +109,10 @@ Pendente
 
 Somente apontamentos aprovados entram no cálculo das horas realizadas e, consequentemente, nos indicadores do projeto.
 
+## Modelo do Banco de Dados
+
+![Modelo do banco de dados](docs/diagramaBD.png)
+
 ---
 
 # 🛠 Tecnologias
@@ -173,6 +177,10 @@ Mantive a arquitetura simples e proporcional ao tamanho do projeto.
 Considerei adicionar padrões como CQRS, mas isso aumentaria a complexidade sem trazer benefício proporcional para o escopo atual.
 
 O `DbContext` já atende adequadamente às necessidades de persistência deste case.
+
+## Desenho da Solução
+
+![Desenho da solução](docs/arquiteturaSolucao.png)
 
 ---
 
