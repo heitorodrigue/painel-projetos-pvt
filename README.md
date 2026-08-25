@@ -1,21 +1,21 @@
 # 📊 Painel de Projetos PVT
 
-Sistema para acompanhar a situação de projetos usando horas planejadas, horas vendidas e horas já realizadas.
+Sistema para acompanhamento da situação de projetos com base em horas planejadas, horas vendidas e horas realizadas.
 
-Esse projeto foi desenvolvido como case técnico para a vaga de **DEV Web e Infraestrutura JR da PVT Software**.
-
-A ideia aqui não foi tentar construir um sistema completo. Preferi focar mais na modelagem, nas regras de negócio e em uma pequena parte funcionando de ponta a ponta.
+A proposta não foi construir um sistema completo de gestão de projetos. O foco foi modelar o domínio, implementar as principais regras de negócio e entregar uma aplicação funcional de ponta a ponta, com backend, API e interface web.
 
 ---
 
 # ✨ Funcionalidades
 
-- Listagem dos projetos com seus indicadores
-- Consulta de um projeto específico
-- Criação de apontamentos
-- Aprovação ou rejeição de apontamentos
-- Atualização dos indicadores após um apontamento ser aprovado
-- Classificação do projeto como Saudável, Atenção ou Crítico
+- Listagem dos projetos com seus principais indicadores
+- Consulta detalhada de um projeto
+- Visualização dos apontamentos vinculados ao projeto
+- Criação de novos apontamentos
+- Aprovação ou rejeição de apontamentos pendentes
+- Atualização automática dos indicadores após a aprovação de um apontamento
+- Classificação do projeto como **Saudável**, **Atenção** ou **Crítico**
+- Feedback visual de carregamento, sucesso e erro nas principais operações
 
 ---
 
@@ -43,7 +43,7 @@ O projeto é analisado por dois indicadores:
 | Atenção  | Pelo menos um consumo chegou a 90%   |
 | Crítico  | Pelo menos um consumo chegou a 100%  |
 
-Os valores de 90% e 100% são regras iniciais. Em um sistema real, eu deixaria isso configurável dependendo do projeto ou contrato.
+Os valores de 90% e 100% representam regras iniciais do case. Em um sistema real, esses limites poderiam ser configuráveis por projeto ou contrato.
 
 ---
 
@@ -65,38 +65,41 @@ Analista
    └── Apontamentos
 ```
 
-### Cliente
+## Cliente
 
 Representa a empresa dona do projeto.
 
-### Projeto
+## Projeto
 
 É a entidade principal do sistema.
 
-Guarda informações como cliente, horas vendidas, horas planejadas, período previsto e os apontamentos realizados.
+Guarda informações como cliente, horas vendidas, horas planejadas e os apontamentos realizados.
 
-Separei `HorasVendidas` de `HorasPlanejadas` porque elas representam coisas diferentes. As horas vendidas mostram o limite contratado pelo cliente, enquanto as horas planejadas mostram a estimativa interna para executar o projeto.
+Separei `HorasVendidas` de `HorasPlanejadas` porque representam conceitos diferentes:
 
-Isso ajuda a responder duas perguntas diferentes:
+- **Horas vendidas:** representam o limite contratado pelo cliente.
+- **Horas planejadas:** representam a estimativa interna de esforço para executar o projeto.
 
-- Estamos gastando mais esforço do que planejamos?
-- Estamos perto de consumir todas as horas vendidas?
+Essa separação permite responder duas perguntas diferentes:
 
-### Analista
+- Estamos consumindo mais esforço do que o planejado?
+- Estamos próximos de consumir todas as horas contratadas?
+
+## Analista
 
 Representa quem trabalha nos projetos e registra os apontamentos.
 
-### Alocação
+## Alocação
 
 Representa a participação planejada de um analista em um projeto.
 
-Ela ainda não influencia diretamente os indicadores. Mantive essa entidade porque, com mais tempo, ela poderia ser usada para analisar capacidade e sobrecarga dos analistas.
+Ela ainda não influencia diretamente os indicadores do sistema. Foi mantida na modelagem porque poderia ser utilizada futuramente para análises de capacidade, disponibilidade e sobrecarga dos analistas.
 
-### Apontamento
+## Apontamento
 
-Representa um registro de horas trabalhadas.
+Representa um registro de horas trabalhadas em um projeto.
 
-O fluxo é simples:
+O fluxo de status é:
 
 ```text
 Pendente
@@ -104,53 +107,72 @@ Pendente
    └── Rejeitado
 ```
 
-Só apontamentos aprovados entram nos cálculos do projeto.
+Somente apontamentos aprovados entram no cálculo das horas realizadas e, consequentemente, nos indicadores do projeto.
 
 ---
 
 # 🛠 Tecnologias
+
+## Backend
 
 - ASP.NET Core Web API (.NET 9)
 - Entity Framework Core 9
 - SQLite
 - Swagger / Swashbuckle
 
+## Frontend
+
+- React
+- TypeScript
+- Vite
+- CSS puro
+
 ---
 
 # 📂 Estrutura do Projeto
 
 ```text
-src/
-└── PainelProjetosPVT.Api/
-    ├── Aplicacao/
-    │   ├── DTOs/
-    │   └── Servicos/
-    │
-    ├── Controllers/
-    │
-    ├── Dominio/
-    │   ├── Entidades/
-    │   └── Enums/
-    │
-    └── Infraestrutura/
-        ├── Integracoes/
-        └── Persistencia/
+painel-projetos-pvt/
+│
+├── src/
+│   └── PainelProjetosPVT.Api/
+│       ├── Aplicacao/
+│       │   ├── DTOs/
+│       │   └── Servicos/
+│       │
+│       ├── Controllers/
+│       │
+│       ├── Dominio/
+│       │   ├── Entidades/
+│       │   └── Enums/
+│       │
+│       └── Infraestrutura/
+│           ├── Integracoes/
+│           └── Persistencia/
+│
+└── frontend/
+    └── src/
+        ├── components/
+        ├── pages/
+        ├── services/
+        └── types/
 ```
 
 ---
 
 # 🏛 Arquitetura
 
-Mantive a arquitetura simples:
+Mantive a arquitetura simples e proporcional ao tamanho do projeto.
 
-- **Controllers:** recebem as requisições.
-- **Aplicacao:** contém DTOs e serviços.
-- **Dominio:** contém as entidades e regras principais.
+- **Controllers:** recebem as requisições HTTP e expõem os endpoints.
+- **Aplicacao:** contém DTOs e serviços responsáveis pelos casos de uso e cálculos.
+- **Dominio:** contém as entidades e regras principais do negócio.
 - **Infraestrutura:** cuida da persistência e deixa espaço para futuras integrações.
+- **Frontend:** separado em páginas, componentes reutilizáveis, serviços de comunicação com a API e definições de tipos.
 
-Pensei em adicionar mais padrões e camadas, mas não faria sentido para o tamanho atual do projeto.
+Considerei adicionar padrões como CQRS, mas isso aumentaria a complexidade sem trazer benefício proporcional para o escopo atual.
 
-Por isso não usei CQRS, MediatR ou Repository Pattern. O `DbContext` já resolve bem a persistência nessa versão e adicionar mais abstrações só aumentaria o código.
+O `DbContext` já atende adequadamente às necessidades de persistência deste case.
 
 ---
 
@@ -159,7 +181,8 @@ Por isso não usei CQRS, MediatR ou Repository Pattern. O `DbContext` já resolv
 | Método | Endpoint                          | Descrição                            |
 | ------ | --------------------------------- | ------------------------------------ |
 | GET    | `/api/projetos`                   | Lista os projetos e seus indicadores |
-| GET    | `/api/projetos/{id}`              | Busca um projeto                     |
+| GET    | `/api/projetos/{id}`              | Busca os detalhes de um projeto      |
+| GET    | `/api/projetos/{id}/apontamentos` | Lista os apontamentos de um projeto  |
 | POST   | `/api/projetos/{id}/apontamentos` | Cria um apontamento                  |
 | PATCH  | `/api/apontamentos/{id}/status`   | Aprova ou rejeita um apontamento     |
 
@@ -174,7 +197,7 @@ Por isso não usei CQRS, MediatR ou Repository Pattern. O `DbContext` já resolv
 }
 ```
 
-Todo novo apontamento começa como `Pendente`.
+Todo novo apontamento começa com o status `Pendente`.
 
 ## Alterar status
 
@@ -184,7 +207,46 @@ Todo novo apontamento começa como `Pendente`.
 }
 ```
 
-Depois de aprovado, as horas passam a entrar nos indicadores do projeto.
+Quando um apontamento é aprovado, suas horas passam a ser consideradas no cálculo das horas realizadas e dos indicadores do projeto.
+
+---
+
+# 🖥 Frontend
+
+O frontend consome diretamente a API e possui duas telas principais:
+
+## Painel de projetos
+
+Exibe:
+
+- Quantidade total de projetos
+- Quantidade de projetos saudáveis
+- Quantidade de projetos em atenção
+- Quantidade de projetos críticos
+- Consumo planejado e contratado de cada projeto
+- Horas realizadas, planejadas e vendidas
+
+## Detalhes do projeto
+
+Exibe:
+
+- Informações gerais do projeto
+- Indicadores de consumo
+- Saldo planejado e contratado
+- Lista de apontamentos
+- Status de cada apontamento
+- Ações para aprovar ou rejeitar apontamentos pendentes
+- Formulário para registrar novos apontamentos
+
+Após criar ou atualizar um apontamento, os dados do projeto são recarregados para refletir o estado atual da aplicação.
+
+## Analista fixo no frontend
+
+Como este é um case técnico e não há autenticação ou gerenciamento de usuários implementado, o frontend utiliza temporariamente o `analistaId: 1` para novos apontamentos.
+
+A API continua responsável por validar se o analista existe e está ativo.
+
+Em uma evolução real do sistema, o analista seria identificado a partir do usuário autenticado, eliminando a necessidade de informar ou manter esse ID no frontend.
 
 ---
 
@@ -192,69 +254,113 @@ Depois de aprovado, as horas passam a entrar nos indicadores do projeto.
 
 ## Por que não usei avanço físico?
 
-Inicialmente, eu tinha pensado em calcular o avanço físico usando as horas realizadas.
+Inicialmente, considerei calcular o avanço físico utilizando as horas realizadas.
 
-Depois percebi que isso não era uma boa representação. Um projeto pode ter consumido 80% das horas e entregue apenas 40% do que precisava ser entregue. Nesse caso, dizer que o projeto está com 80% de avanço físico seria enganoso.
+Depois percebi que isso seria uma representação incorreta. Um projeto pode ter consumido 80% das horas disponíveis e entregue apenas 40% do escopo previsto.
 
-Por isso preferi mudar os indicadores para consumo planejado e consumo contratado. Esses valores representam exatamente o que os dados disponíveis conseguem medir.
+Nesse cenário, informar 80% de avanço físico seria enganoso.
 
-Se tivesse mais tempo, adicionaria marcos ou entregas ao projeto para calcular o avanço físico de verdade.
+Por isso, preferi trabalhar com:
+
+- Consumo planejado
+- Consumo contratado
+
+Esses indicadores representam exatamente o que pode ser calculado com os dados disponíveis.
+
+Com mais tempo, adicionaria marcos, entregas ou itens de escopo ao projeto para permitir o cálculo de avanço físico real.
 
 ## SQLite
 
-Escolhi SQLite porque o objetivo era deixar o projeto fácil de rodar e testar.
+Escolhi SQLite para facilitar a execução e avaliação do projeto.
 
-Para um sistema real com mais usuários e acessos simultâneos, eu migraria para PostgreSQL ou SQL Server.
+Para um sistema real com múltiplos usuários e acessos simultâneos, a escolha mais adequada seria PostgreSQL ou SQL Server.
 
 ## Cálculo dos indicadores
 
-Hoje os apontamentos são carregados junto com o projeto e os cálculos são feitos no serviço.
+Os apontamentos são utilizados para calcular as horas realizadas do projeto.
 
-Para o tamanho do case, isso é suficiente.
+Apenas registros com status `Aprovado` entram no cálculo.
 
-Com um volume maior de dados, eu provavelmente faria agregações no banco e criaria consultas específicas para o painel.
+Para o volume atual de dados, carregar os apontamentos e realizar o cálculo no serviço é suficiente.
+
+Em um cenário com maior volume, eu utilizaria agregações no banco de dados e consultas específicas para o painel.
+
+## Frontend sem biblioteca de componentes
+
+A interface foi construída utilizando React, TypeScript e CSS puro.
+
+Para o escopo do case, isso permitiu manter o projeto simples, sem adicionar dependências desnecessárias.
+
+Em uma aplicação maior, bibliotecas de componentes ou um design system poderiam ajudar a manter consistência e acelerar o desenvolvimento.
 
 ---
 
-# 🚀 O que eu faria depois
+# 🚀 Melhorias Futuras
 
-Se tivesse mais tempo, as próximas melhorias seriam:
-
-- Testes automatizados para as regras de saúde
-- Autenticação e autorização
-- Filtros e paginação
-- Configuração dos limites de saúde
-- Análise de capacidade usando as alocações
-- Marcos ou entregas para medir avanço físico real
-- Logs e métricas
-- Integrações com sistemas externos
-- Migração para PostgreSQL ou SQL Server
-
-Para integrações externas, também pensaria em timeout, retry e circuit breaker para evitar que a indisponibilidade de outro sistema derrubasse o fluxo principal.
+- Testes automatizados (unitários e de integração): Garantem a precisão das regras de saúde e evitam regressões na API a cada novo alteração.
+- Autenticação e autorização (JWT) + Identificação automática: Protegem as rotas do sistema e vinculam o analista logado diretamente aos apontamentos, eliminando o preenchimento manual de IDs.
+- Gerenciamento de analistas no frontend: Permite controlar acessos, criar novos usuários e gerenciar perfis de uso pela interface.
+- Filtros e paginação: Otimizam o desempenho e a navegação quando a quantidade de projetos e registros crescer.
+- Configuração dinâmica de limites de saúde: Permite ajustar os limites percentuais de status (Saudável, Atenção, Crítico) diretamente por projeto.
+- Análise de capacidade e Marcos/Entregas: Permitem planejar a alocação da equipe e cruzar o progresso físico real com as horas consumidas.
+- Logs, métricas e integrações externas: Facilitam a observabilidade em produção e a conexão com sistemas como Jira ou ERPs.
+- Migração para PostgreSQL: Excelente para testes locais, um banco relacional robusto para produção, capaz de lidar com altas taxas de gravações simultâneas e concorrência de acessos.
 
 ---
 
 # ▶️ Como Executar
+
+## Backend
+
+Na raiz do projeto:
 
 ```bash
 dotnet restore
 dotnet run --project src/PainelProjetosPVT.Api
 ```
 
-O projeto utiliza SQLite e cria dados iniciais automaticamente.
+A API será iniciada localmente.
 
-Existem três cenários para demonstrar os indicadores:
+O Swagger estará disponível em:
+
+```text
+http://localhost:5121/swagger
+```
+
+O projeto utiliza SQLite e possui dados iniciais para demonstrar os diferentes cenários de saúde.
+
+Existem três projetos representando:
 
 - Projeto saudável
 - Projeto em atenção
 - Projeto crítico
 
-Depois de iniciar a aplicação, o Swagger pode ser usado para testar os endpoints.
+## Frontend
+
+Em outro terminal, acesse a pasta do frontend:
+
+```bash
+cd frontend
+```
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Inicie a aplicação:
+
+```bash
+npm run dev
+```
+
+O Vite exibirá no terminal o endereço local para acessar a interface.
+
+Para o frontend funcionar corretamente, o backend deve estar em execução.
 
 ---
 
 # 👨‍💻 Autor
 
-**Heitor Rodrigues Araujo**
-
-Desenvolvido como case técnico para o processo seletivo da PVT Software.
+**Heitor Rodrigues Araujo**.
